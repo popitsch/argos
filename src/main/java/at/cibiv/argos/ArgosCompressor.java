@@ -663,7 +663,7 @@ public class ArgosCompressor {
 
 	    conf.setProperty(OPT_VERBOSE, line.hasOption(OPT_VERBOSE) + "");
 
-	    ArgosCompressor compressor = new ArgosCompressor(conf);
+	    new ArgosCompressor(conf);
 
 	    System.out.println("Finished.");
 	    System.exit(0);
