@@ -4,20 +4,22 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 
+import at.cibiv.ngs.tools.util.BinnedHistogram;
+
 public class ReadScoresStatistics {
 
     public static void calcStats(File scoreFileGzip, int rl, int step, PrintStream out) throws IOException {
 
 	NGMScoreFileIterator it = new NGMScoreFileIterator(scoreFileGzip, rl, step);
+	BinnedHistogram bh = new BinnedHistogram(10);
 	int c = 0;
 	while (it.hasNext()) {
 	    // get next entry in score file
 	    ReadScores sc = it.next();
 	    c++;
-	    if (c > 100)
-		break;
-	    System.out.println(sc);
+	    bh.push( sc.getEntities() );
 	}
+	System.out.println(bh);
     }
 
     /**
@@ -26,7 +28,7 @@ public class ReadScoresStatistics {
      */
     public static void main(String[] args) throws IOException {
 
-	args = new String[] { "" };
+	//args = new String[] { "c:/data/genomicAmbiguity/ecK12/eck12_MG1655_ecoli-chr.scores.gz" };
 	int rl = 100;
 	int step = 10;
 
