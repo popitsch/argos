@@ -29,17 +29,16 @@ public class ReadScoresStatistics {
 		}
 		System.out.println(h);
 	}
-
 	/**
 	 * @param args
 	 * @throws IOException
 	 */
 	public static void main(String[] args) throws IOException {
 
-		args = new String[] { "/project2/oesi/genAmb/output/hg19/hg19.scores.gz" };
+		//args = new String[] { "/project2/oesi/genAmb/output/hg19/hg19.scores.gz" };
+		//args = new String[] { "c:/data/genomicAmbiguity/ecK12/eck12_MG1655_ecoli-chr.scores.gz" };
 		int rl = 100;
 		int step = 10;
-
 		calcStats(new File(args[0]), rl, step, System.out);
 	}
 
