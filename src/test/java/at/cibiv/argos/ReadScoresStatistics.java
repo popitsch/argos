@@ -22,7 +22,6 @@ public class ReadScoresStatistics {
 
 			if ( c % 100000 == 0 ) {
 				System.out.print(".");
-				break;
 			}
 			if ( c % 10000000 == 0 )
 				System.out.println();
