@@ -84,14 +84,14 @@ public class ArgosGenomeGCStatsExtractor {
 	    }
 	    // inc overall stats
 	    System.out.println("Chr: " + chr);
-	    stats.inc("inROI-A", stats.get(chr + "inROI-A"));
-	    stats.inc("outROI-A", stats.get(chr + "outROI-A"));
-	    stats.inc("inROI-G", stats.get(chr + "inROI-G"));
-	    stats.inc("outROI-G", stats.get(chr + "outROI-G"));
-	    stats.inc("inROI-C", stats.get(chr + "inROI-C"));
-	    stats.inc("outROI-C", stats.get(chr + "outROI-C"));
-	    stats.inc("inROI-T", stats.get(chr + "inROI-T"));
-	    stats.inc("outROI-T", stats.get(chr + "outROI-T"));
+	    stats.inc("inROI-A", stats.get(chr + "inROI-A", 0));
+	    stats.inc("outROI-A", stats.get(chr + "outROI-A", 0));
+	    stats.inc("inROI-G", stats.get(chr + "inROI-G", 0));
+	    stats.inc("outROI-G", stats.get(chr + "outROI-G", 0));
+	    stats.inc("inROI-C", stats.get(chr + "inROI-C", 0));
+	    stats.inc("outROI-C", stats.get(chr + "outROI-C", 0));
+	    stats.inc("inROI-T", stats.get(chr + "inROI-T", 0));
+	    stats.inc("outROI-T", stats.get(chr + "outROI-T", 0));
 	    stats.inc("inROI-N", stats.get(chr + "inROI-N", 0));
 	    stats.inc("outROI-N", stats.get(chr + "outROI-N", 0));
 	}
@@ -100,11 +100,11 @@ public class ArgosGenomeGCStatsExtractor {
 	out.println(stats);
 	out.println("----------------------------------------");
 
-	double inROIACTG = stats.get("inROI-A") + stats.get("inROI-C") + stats.get("inROI-T") + stats.get("inROI-G");
-	double outROIACTG = stats.get("outROI-A") + stats.get("outROI-C") + stats.get("outROI-T") + stats.get("outROI-G");
+	double inROIACTG = stats.get("inROI-A", 0) + stats.get("inROI-C", 0) + stats.get("inROI-T", 0) + stats.get("inROI-G", 0);
+	double outROIACTG = stats.get("outROI-A", 0) + stats.get("outROI-C", 0) + stats.get("outROI-T", 0) + stats.get("outROI-G", 0);
 	double overallACTG = inROIACTG + outROIACTG;
-	double inROIGC = stats.get("inROI-C") + stats.get("inROI-G");
-	double outROIGC = stats.get("outROI-C") + stats.get("outROI-G");
+	double inROIGC = stats.get("inROI-C", 0) + stats.get("inROI-G", 0);
+	double outROIGC = stats.get("outROI-C", 0) + stats.get("outROI-G", 0);
 	double overallGC = inROIGC + outROIGC;
 	double inROIGCPerc = inROIGC / inROIACTG;
 	double outROIGCPerc = outROIGC / outROIACTG;
