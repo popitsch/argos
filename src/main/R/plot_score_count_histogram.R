@@ -11,7 +11,9 @@ library(gridExtra)
 library(directlabels)
 library(cwhmisc)
 
-data="/project2/oesi/genAmb/output/hg19-NO_SCORE_LIMIT/hg19.scores.gz.hist.csv"
+#data="/project2/oesi/genAmb/output/hg19/hg19.scores.gz.hist.csv"
+data="c:/data/genomicAmbiguity/human/hg19.scores.gz.scorehist.bin20.txt"
+
 label="hg19, no score limit, local alignment"
 		
 # input: binned histogram
@@ -23,10 +25,14 @@ fileGraphOutput=paste(data,".pdf", sep="")
 
 pdf(fileGraphOutput, width=10,height=8)
 
+par(mfrow=c(1,2))
+
 barplot(as.matrix(data1), xlab="# of scores", ylab="frequency", main=label)
 maxval=max(data1)
 maxbin=colnames(data1)[which.max(data1)]
 text(1000,100000, paste("max:",maxval,"bin:",maxbin))
+
+barplot(as.matrix(data1[,2:100]), xlab="# of scores", ylab="frequency", main=paste(label, "subset: bins 2-100"))
 
 dev.off()
 
