@@ -9,7 +9,6 @@ library(gridExtra)
 library(directlabels)
 library(cwhmisc)
 
-
 # input: binned histogram
 #data1=data.frame(read.csv("c:/data/genomicAmbiguity/human/HIST-hg19-CCDS-ISS.csv", sep="\t", header=T,comment.char = "#"))
 
@@ -60,10 +59,17 @@ par(mfrow=c(1,1))
 ##abline(v=ave(dataISSIn[dataISSIn$V6<10,]$V6), col="red")
 #abline(v=median(dataISSEx[dataISSEx$V6<10,]$V6), col="blue", lty=2)
 #abline(v=median(dataISSIn[dataISSIn$V6<10,]$V6), col="red", lty=2)
-
-plot(dataISSMerged$V2, dataISSMerged$V3, xlim=c(0,100), ylim=c(0,100), col="blue", pch="o")
+pcol=rgb(red=0, green=0, blue=1, alpha=.3)
+plot(dataISSMerged$V2, dataISSMerged$V3, xlab="exon ISS", ylab="intron ISS", main="Intron vs. Exon ISS", xlim=c(0,100), ylim=c(0,100), col=pcol, pch=20)
 abline(0,1)
-# list the genes with high exon ISS and low intron ISS
+
+#list the genes with high exon ISS and low intron ISS
+rect(80, 20, 100, 0, border="red")
 dataISSMerged[dataISSMerged$V2>80 & dataISSMerged$V3<20 & dataISSMerged$V3 >= 0,]
+
+#list the genes with high exon ISS and low intron ISS
+rect(0, 100, 30, 60, border="red")
+dataISSMerged[dataISSMerged$V2<30 & dataISSMerged$V3<=100 & dataISSMerged$V3 > 60,]
+
 
 #dev.off()
