@@ -28,7 +28,7 @@ usage = '''
    /_| /__)/_  /  )(   
   /  |/ | (__)(__/__)  pipeline
 
-  Copyright 2014 CIBIV. All rights reserved.
+  Copyright 2014 Niko Popitsch. All rights reserved.
   
   Licensed under the Apache License 2.0
   http://www.apache.org/licenses/LICENSE-2.0
