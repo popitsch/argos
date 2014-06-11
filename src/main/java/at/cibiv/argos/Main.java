@@ -42,8 +42,6 @@ public class Main {
 	 */
 	public static void main(String[] args) throws IOException {
 
-
-		
 		// create the command line parser
 		CommandLineParser parser = new PosixParser();
 
