@@ -4,15 +4,25 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
-import at.cibiv.codoc.CoverageTools;
+import at.cibiv.codoc.CompressedCoverageIterator;
+import at.cibiv.codoc.CoverageDecompressor;
+import at.cibiv.ngs.tools.exon.Gene;
+import at.cibiv.ngs.tools.exon.RefSeqDb;
 import at.cibiv.ngs.tools.lds.GenomicInterval;
-import at.cibiv.ngs.tools.util.BinnedHistogram;
+import at.cibiv.ngs.tools.util.GenomicPosition;
+import at.cibiv.ngs.tools.util.Statistics;
+import at.cibiv.ngs.tools.util.StringUtils;
 import at.cibiv.ngs.tools.util.TabIterator;
 
 public class ArgosGeneAnalysis {
@@ -30,115 +40,6 @@ public class ArgosGeneAnalysis {
 	// return String.format("%." + comma + "f", f);
 	// }
 	//
-	// /**
-	// * Calculates the base-coverage per feature in a passed UCSC refseq data
-	// * file. The output will be sorted by genomic coordinates. FIXME:
-	// * experimental method - use with care.
-	// *
-	// * @param covFile
-	// * @param covVcfFile
-	// * @param bedFile
-	// * @param covOut
-	// * @throws Throwable
-	// */
-	// public static void doGeneAnalysis2(File covFile, File covVcfFile, File
-	// ucscFlatFile, PrintStream covOut) throws Throwable {
-	// CoverageDecompressor cov = null;
-	//
-	// try {
-	// if (debug)
-	// System.out.println("Load " + covFile + " / " + ucscFlatFile);
-	//
-	// RefSeqDb db = new RefSeqDb(ucscFlatFile);
-	// Map<Gene, Float> geneCoverageMap = new HashMap<Gene, Float>();
-	// Map<Gene, Float> genePosUnmappedMap = new HashMap<Gene, Float>();
-	// for (Gene gene : db.getGenesSorted()) {
-	// for (ExonInterval ex : gene.getExonsSorted())
-	// ex.setAnnotation("gene", gene);
-	// // System.out.println( gene );
-	// }
-	//
-	// cov = CoverageDecompressor.loadFromFile(covFile, covVcfFile);
-	// CoverageTools.debug = false;
-	// if (debug)
-	// System.out.println(Arrays.toString(cov.getChromosomes().toArray()));
-	//
-	// covOut.println("min/max are gene positions; cov, width, avg.cov is calc only over exons.");
-	// covOut.println("#chr\tmin\tmax\tname\tstrand\twidth\tcov\tavg.cov\tperc.uncov");
-	//
-	// Map<String, ITree<Long>> exonTrees = db.buildItrees();
-	// Map<String, ITree<Long>> intronTrees = db.buildIntronItrees();
-	//
-	// CompressedCoverageIterator it = cov.getCoverageIterator();
-	// // list of chromosome names that could not be matched.
-	// Set<String> ignoredChromosomes = new HashSet<String>();
-	//
-	// while (it.hasNext()) {
-	// Float h = it.next();
-	// float coverage = (h == null) ? 0f : h;
-	// GenomicPosition pos = it.getGenomicPosition();
-	// if (pos == null) {
-	// break;
-	// }
-	// ExonChromosomeTree tree = (ExonChromosomeTree)
-	// exonTrees.get(pos.getChromosome());
-	// if (tree == null)
-	// tree = (ExonChromosomeTree) exonTrees.get(pos.getChromosomeOriginal());
-	// if (tree == null) {
-	// ignoredChromosomes.add(pos.getChromosome());
-	// continue;
-	// }
-	// List<Interval<Long>> res = tree.query(pos.get0Position());
-	// for (Interval<Long> ex : res) {
-	// Gene g = (Gene) ex.getAnnotation("gene");
-	// Float geneCov = geneCoverageMap.get(g);
-	// if (geneCov == null)
-	// geneCov = 0f;
-	// geneCov += coverage;
-	// geneCoverageMap.put(g, geneCov);
-	//
-	// if (geneCov == 0f) {
-	// Float posUnmapped = genePosUnmappedMap.get(g);
-	// if (posUnmapped == null)
-	// posUnmapped = 0f;
-	// posUnmapped++;
-	// geneCoverageMap.put(g, geneCov);
-	// }
-	// }
-	// }
-	//
-	// if (ignoredChromosomes.size() > 0)
-	// System.err.println("Ignored chromosomes: " + ignoredChromosomes);
-	//
-	// for (Gene gene : db.getGenesSorted()) {
-	// Float geneCov = geneCoverageMap.get(gene);
-	// Float posUnmapped = genePosUnmappedMap.get(gene);
-	// covOut.print(toStr(gene.getChromosome()) + "\t");
-	// covOut.print(toStr(gene.getMin()) + "\t");
-	// covOut.print(toStr(gene.getMax()) + "\t");
-	// covOut.print(toStr(gene.getName()) + "\t");
-	// covOut.print(toStr(gene.getStrand()) + "\t");
-	// covOut.print(toFloat(gene.getWidth(), 0) + "\t");
-	// covOut.print(toFloat(geneCov, 0) + "\t");
-	// if (geneCov == null)
-	// covOut.print("n/a\t");
-	// else
-	// covOut.print(toFloat((gene.getWidth() == null ? 0f : (geneCov /
-	// gene.getWidth())), 1) + "\t");
-	// covOut.print(toFloat((posUnmapped == null ? 0f : (posUnmapped /
-	// gene.getWidth())), 1) + "\t");
-	// covOut.println();
-	// }
-	//
-	// } finally {
-	// if (cov != null)
-	// cov.close();
-	// }
-	// if (debug)
-	// System.out.println("Finished.");
-	//
-	// }
-
 	/**
 	 * Calculates the base-coverage per feature in a passed UCSC refseq data
 	 * file. The output will be sorted by genomic coordinates. FIXME:
@@ -150,73 +51,222 @@ public class ArgosGeneAnalysis {
 	 * @param covOut
 	 * @throws Throwable
 	 */
-	public static void doGeneAnalysis(File covFile, File covVcfFile, File bedFile, File outFile, File histFile, int binSize) throws Throwable {
+	public static void doGeneAnalysis2(File covFile, File covVcfFile, File ucscFlatFile, PrintStream out, PrintStream statsOut) throws Throwable {
+		CoverageDecompressor cov = null;
+		Statistics stats = new Statistics();
 
-		BinnedHistogram bh = new BinnedHistogram(binSize);
+		try {
+			if (debug)
+				System.out.println("Load " + covFile + " / " + ucscFlatFile);
 
-		List<File> covFiles = new ArrayList<File>();
-		covFiles.add(covFile);
+			RefSeqDb db = new RefSeqDb(ucscFlatFile);
 
-		System.out.println("calculate interval coverage for " + bedFile);
-		Map<GenomicInterval, Map<File, Double>> intervalsAnnotated = CoverageTools.calculateCoveragePerBedFeature(covFiles, null, bedFile, null);
-
-		Map<String, double[]> geneCoverageMap = new HashMap<String, double[]>();
-		Map<String, GenomicInterval> geneMap = new HashMap<String, GenomicInterval>();
-
-		for (GenomicInterval iv : intervalsAnnotated.keySet()) {
-
-			double avgCov = intervalsAnnotated.get(iv).get(covFile);
-			String geneName = iv.getUri().substring(0, iv.getUri().lastIndexOf("_"));
-			iv.setAnnotation("gene", geneName);
-
-			double exonWidth = iv.getWidth() + 1;
-			double exonCov = avgCov * exonWidth;
-
-			double[] cov = geneCoverageMap.get(geneName);
-
-			if (cov == null)
-				cov = new double[3];
-			cov[0] += exonCov; // total cov
-			cov[1] += exonWidth; // total width
-			cov[2] += 1; // num of found exons
-			geneCoverageMap.put(geneName, cov);
-
-			GenomicInterval gene = geneMap.get(geneName);
-			if (gene == null)
-				gene = iv;
-			String chr = gene.getOriginalChrom();
-			gene = new GenomicInterval(gene.getOriginalChrom(), Math.min(gene.getMin(), iv.getMin()), Math.max(gene.getMax(), iv.getMax()), geneName);
-			gene.setOriginalChrom(chr);
-			geneMap.put(geneName, gene);
-			// System.out.println(iv + "\t" + iv.getAnnotation("gene") + "\t" +
-			// avgCov);
-		}
-
-		// write out.
-		PrintStream out = new PrintStream(outFile);
-		out.println("#gene\tpos\ttotal-cov\ttotal-width\tfound-exons\tav.cov");
-		for (String geneName : geneCoverageMap.keySet()) {
-			double[] cov = geneCoverageMap.get(geneName);
-			GenomicInterval gene = geneMap.get(geneName);
-			double avgCov = 0f;
-			out.print(geneName + "\t" + gene.toCoordString() + "\t");
-			if (cov == null) {
-				out.println("no exon\tno exon\tno exon\tno exon");
-			} else {
-				avgCov = (cov[0] / cov[1]);
-				out.println(cov[0] + "\t" + cov[1] + "\t" + cov[2] + "\t" + avgCov);
+			// get a sorted and annotated list of all genomic intervals.
+			List<GenomicInterval> allIntervalsSorted = new ArrayList<>();
+			for (Gene g : db.getGenesSorted()) {
+				Map<String, List<GenomicInterval>> data = g.getUtrExIntronLists();
+				allIntervalsSorted.addAll(data.get("5pUTR"));
+				allIntervalsSorted.addAll(data.get("3pUTR"));
+				allIntervalsSorted.addAll(data.get("exon"));
+				allIntervalsSorted.addAll(data.get("intron"));
 			}
 
-			bh.push((int) Math.round(avgCov));
+			Collections.sort(allIntervalsSorted);
+			// create lists [per chrom.
+			Map<String, List<GenomicInterval>> allIntervalsSortedPerChrom = new HashMap<String, List<GenomicInterval>>();
+			for (GenomicInterval g : allIntervalsSorted) {
+				List<GenomicInterval> l = allIntervalsSortedPerChrom.get(g.getOriginalChrom());
+				if (l == null)
+					l = new ArrayList<>();
+				l.add(g);
+				allIntervalsSortedPerChrom.put(g.getOriginalChrom(), l);
+			}
+			Double igSum = 0d;
+			Double igWidth = 0d;
+			List<String> consideredChromosomes = new ArrayList<>();
+
+			// annotate intervals with score sum.
+			try {
+				cov = CoverageDecompressor.loadFromFile(covFile, covVcfFile);
+				for (String cc : cov.getChromosomes())
+					consideredChromosomes.add(StringUtils.prefixedChr(cc));
+				if (debug)
+					System.out.println("Handled chroms: " + Arrays.toString(cov.getChromosomes().toArray()));
+
+				CompressedCoverageIterator it = cov.getCoverageIterator();
+
+				String currentChr = null;
+				Iterator<GenomicInterval> bfit = null;
+				GenomicInterval nextInterval = null;
+				List<GenomicInterval> overlapping = new ArrayList<GenomicInterval>();
+
+				while (it.hasNext()) {
+
+					Float coverage = it.next();
+					GenomicPosition pos = it.getGenomicPosition();
+					int category = 0;
+
+					if (currentChr == null || !currentChr.equals(pos.getChromosomeOriginal())) {
+						overlapping.clear();
+						currentChr = pos.getChromosomeOriginal();
+						if (allIntervalsSortedPerChrom.get(currentChr) == null) {
+							System.err.println("Cannot load any intervals for " + currentChr);
+							bfit = null;
+							nextInterval = null;
+						} else {
+							bfit = allIntervalsSortedPerChrom.get(currentChr).iterator();
+							nextInterval = null;
+							System.err.println("switch to " + currentChr);
+						}
+					}
+
+					// del intervals that are finished
+					Iterator<GenomicInterval> delit = overlapping.iterator();
+					while (delit.hasNext()) {
+						GenomicInterval iv = delit.next();
+						if (!iv.contains(pos)) {
+							delit.remove();
+							// System.out.println("fin" + iv);
+						}
+					}
+
+					// calc overlapping intervals
+					if (bfit != null) {
+						if (nextInterval == null && bfit.hasNext())
+							nextInterval = bfit.next();
+						if (nextInterval != null)
+							while (nextInterval.contains(pos)) {
+								overlapping.add(nextInterval);
+								if (!bfit.hasNext()) {
+									nextInterval = null;
+									break;
+								} else {
+									nextInterval = bfit.next();
+								}
+							}
+					}
+					// increment score sums.
+					for (GenomicInterval gi : overlapping) {
+						String type = (String) gi.getAnnotation("type");
+						if (type.equals("exon"))
+							category = Math.max(category, 4);
+						else if (type.equals("5pUTR"))
+							category = Math.max(category, 3);
+						else if (type.equals("3pUTR"))
+							category = Math.max(category, 2);
+						else if (type.equals("intron"))
+							category = Math.max(category, 1);
+
+						Double sum = (Double) gi.getAnnotation("scoreSum");
+						if (sum == null)
+							sum = 0d;
+						sum += coverage;
+						gi.setAnnotation("scoreSum", sum);
+					}
+					// score intergenic regions
+					if (overlapping.size() == 0) {
+						igSum += coverage;
+						igWidth++;
+					}
+
+					// stats
+					switch (category) {
+					case 4:
+						stats.inc("Count-Exon");
+						break;
+					case 3:
+						stats.inc("Count-5pUTR");
+						break;
+					case 2:
+						stats.inc("Count-3pUTR");
+						break;
+					case 1:
+						stats.inc("Count-Intron");
+						break;
+					default:
+						stats.inc("Count-IG");
+						break;
+					}
+					stats.inc("Count-ALL");
+
+				}
+			} finally {
+				if (cov != null)
+					cov.close();
+			}
+
+			// annotate genes with total score sum/width per category
+			if (debug)
+				System.out.println("Annotate genes");
+			SortedSet<Gene> annotatedGenes = new TreeSet<Gene>();
+			for (GenomicInterval g : allIntervalsSorted) {
+				Double isum = (Double) g.getAnnotation("scoreSum");
+				if (isum == null)
+					isum = 0d;
+				Gene gene = (Gene) g.getAnnotation("gene");
+				String type = (String) g.getAnnotation("type");
+
+				Double genesum = (Double) gene.getAnnotation("scoreSum" + type);
+				if (genesum == null) {
+					// outside of considered range? => skip!
+					if (!consideredChromosomes.contains(StringUtils.prefixedChr(g.getChr()))) {
+						if (debug)
+							System.err.println("Skipped gene " + g + " as not considered chromosome");
+						continue;
+					}
+
+					genesum = 0d;
+				}
+				genesum += isum;
+				gene.setAnnotation("scoreSum" + type, genesum);
+
+				Double genewidth = (Double) gene.getAnnotation("scoreWidth" + type);
+				if (genewidth == null)
+					genewidth = 0d;
+				genewidth += (g.getWidth() + 1);
+				gene.setAnnotation("scoreWidth" + type, genewidth);
+
+				annotatedGenes.add(gene);
+			}
+
+			// output all genes
+			if (debug)
+				System.out.println("Output results: " + annotatedGenes.size() + " genes and " + allIntervalsSorted.size() + " intervals");
+			out.print("Gene\tPos\t");
+			out.print("Ex-AvgScore\tEx-Width\tEx-Sum\t");
+			out.print("In-AvgScore\tIn-Width\tIn-Sum\t");
+			out.print("3pUTR-AvgScore\t3pUTR-Width\t3pUTR-Sum\t");
+			out.print("5pUTR-AvgScore\t5pUTR-Width\t5pUTR-Sum\t");
+			out.print("IG-AvgScore\tIG-Width\tIG-Sum");
+			out.println();
+			Double igAvg = igSum / igWidth;
+
+			String[] types = new String[] { "exon", "intron", "3pUTR", "5pUTR" };
+			for (Gene g : annotatedGenes) {
+				out.print(g.getName() + "\t" + g.toPosition1());
+				for (String type : types) {
+					Double genesum = (Double) g.getAnnotation("scoreSum" + type);
+					Double genewidth = (Double) g.getAnnotation("scoreWidth" + type);
+					if ((genesum == null) || (genewidth == null))
+						out.print("\t-\t-\t-");
+					else {
+						// System.out.println(genesum + "?"+genewidth);
+						out.print("\t" + (genesum / genewidth) + "\t" + genewidth + "\t" + genesum);
+					}
+				}
+				out.println("\t" + igAvg + "\t" + igWidth + "\t" + igSum);
+			}
+
+			// print stats
+			stats.toFile(statsOut);
+
+		} finally {
+			if (cov != null)
+				cov.close();
 		}
-		out.close();
+		if (debug)
+			System.out.println("Finished.");
 
-		// write hist.
-		PrintStream histOut = new PrintStream(histFile);
-		histOut.println(bh.toCSV());
-		histOut.close();
-
-		System.out.println("Finished.");
 	}
 
 	/**
@@ -249,16 +299,16 @@ public class ArgosGeneAnalysis {
 			System.out.println("seen " + seen.size() + " gene names in " + fn);
 		}
 	}
-	
-	
+
 	/**
 	 * Creates a simple merged table
+	 * 
 	 * @param exons
 	 * @param introns
 	 * @param merged
 	 * @throws IOException
 	 */
-	public static void mergeExonIntronTable(File exons, File introns, File merged ) throws IOException {
+	public static void mergeExonIntronTable(File exons, File introns, File merged) throws IOException {
 		Map<String, Double> exonScore = new HashMap<>();
 		TabIterator ti = new TabIterator(exons, "#");
 		while (ti.hasNext()) {
@@ -272,23 +322,23 @@ public class ArgosGeneAnalysis {
 		while (ti.hasNext()) {
 			String[] t = ti.next();
 			String geneName = t[0];
-			if ( ! exonScore.keySet().contains(geneName))
+			if (!exonScore.keySet().contains(geneName))
 				throw new IOException("No exon entry for gene " + geneName);
 			Double avcov = Double.parseDouble(t[5]);
 			intronScore.put(geneName, avcov);
 		}
-			
+
 		PrintStream out = new PrintStream(merged);
-		for ( String geneName : exonScore.keySet() ) {
+		for (String geneName : exonScore.keySet()) {
 			Double exScore = exonScore.get(geneName);
 			Double inScore = intronScore.get(geneName);
-			if ( inScore == null ) inScore = -100d;
-			out.println(geneName + "\t" + exScore + "\t" + inScore );
+			if (inScore == null)
+				inScore = -100d;
+			out.println(geneName + "\t" + exScore + "\t" + inScore);
 		}
 		out.close();
 		System.exit(0);
 	}
-	
 
 	/**
 	 * @param args
@@ -296,48 +346,48 @@ public class ArgosGeneAnalysis {
 	 */
 	public static void main(String[] args) throws Throwable {
 
+//		args = new String[] {
+//				"/project2/oesi/genAmb/output/hg19/hg19-GENOME.ISS.wig.codoc",
+//				"/project2/oesi/genAmb/smalltest.delme.txt",
+//				"/project2/oesi/genAmb/smalltest.delme.txt.csv"
+//		};
+//		
 		
-		mergeExonIntronTable(
-				new File( "/project2/oesi/genAmb/output/dros_partial/droso_r5_partial-EXONS-ISS.csv"),
-				new File( "/project2/oesi/genAmb/output/dros_partial/droso_r5_partial-INTRONS-ISS.csv"),
-				new File( "/project2/oesi/genAmb/output/dros_partial/droso_r5_partial-MERGED-ISS.csv")
-				);	
-//		mergeExonIntronTable(
-//				new File( "/project2/oesi/genAmb/output/hg19-NO_SCORE_LIMIT/hg19-NO_SCORE_LIMIT-EXONS-ISS.csv"),
-//				new File( "/project2/oesi/genAmb/output/hg19-NO_SCORE_LIMIT/hg19-NO_SCORE_LIMIT-INTRONS-ISS.csv"),
-//				new File( "/project2/oesi/genAmb/output/hg19-NO_SCORE_LIMIT/hg19-NO_SCORE_LIMIT-MERGED-ISS.csv")
-//				);
-		
-		// smallCheck();
-		// if ( 1==1) return;
-		// args = new String[] {
-		// "/project2/oesi/genAmb/output/hg19-NO_SCORE_LIMIT/hg19-GENOME.ISS.wig.bw.wig.codoc",
-		// "/project/ngs-work/meta/annotations/exons/hg19/refseq/niko/UCSC-RefSeq-genes-exons-only-sorted.bed",
-		// "/project2/oesi/genAmb/output/hg19-NO_SCORE_LIMIT/delme.csv",
-		// "/project2/oesi/genAmb/output/hg19-NO_SCORE_LIMIT/delme.stats.csv",
-		// };
-
-//		args = new String[] { "/project2/oesi/genAmb/output/dros_partial/droso_r5_partial-GENOME.ISS.wig.codoc",
-//				"/project/oesi/genomicAmbiguity/droso/anno/droso_R5_dm3_ucsc.EXONS.sorted.bed",
-//				"/project2/oesi/genAmb/output/dros_partial/droso_r5_partial-EXONS-ISS.csv",
-//				"/project2/oesi/genAmb/output/dros_partial/droso_r5_partial-EXONS-ISS.hist.csv", };
-
 //		 args = new String[] {
-//		 "/project2/oesi/genAmb/output/hg19-NO_SCORE_LIMIT/hg19-GENOME.ISS.wig.bw.wig.codoc",
-//		 "/project/ngs-work/meta/annotations/exons/hg19/refseq/niko/UCSC-RefSeq-genes-introns-only-sorted.bed",
-//		 "/project2/oesi/genAmb/output/hg19-NO_SCORE_LIMIT/hg19-NO_SCORE_LIMIT-INTRONS-ISS.csv",
-//		 "/project2/oesi/genAmb/output/hg19-NO_SCORE_LIMIT/hg19-NO_SCORE_LIMIT-INTRONS-ISS.hist.csv",
-//		 "100"
+//		 "/project2/oesi/genAmb/output/ecK12/eck12_MG1655_ecoli-chr-GENOME.AMB.wig.codoc",
+//		 "/project2/oesi/genAmb/ref/ecK12/e.coli-K12-ucsc-refseq.txt",
+//		 "/project2/oesi/genAmb/output/ecK12/eck12_MG1655_ecoli-chr-GENOME.AMB.FEATURES.csv"
 //		 };
+		 
+//		 args = new String[] {
+//				 "/project2/oesi/genAmb/output/dros_partial-rl100/droso_r5_partial-GENOME.AMB.wig.codoc",
+//				 "/project2/oesi/genAmb/ref/dmel/droso_R5_dm3_ucsc.properchrom.txt",
+//				 "/project2/oesi/genAmb/output/dros_partial-rl100/droso_r5_partial-GENOME.AMB.FEATURES.csv"
+//				 };
 
+		// File covFile = new
+		// File("/project2/oesi/genAmb/output/dros_partial-rl50/droso_r5_partial-GENOME.AMB.wig.codoc");
+		// File ucscFlatFile = new
+		// File("/project2/oesi/genAmb/ref/dmel/droso_R5_dm3_ucsc.properchrom.txt");
+		// PrintStream out = new
+		// PrintStream("/project2/oesi/genAmb/output/dros_partial-rl50/droso_r5_partial-GENOME.AMB.wig.codoc.TEST.csv");
 
-		File codocFile = new File(args[0]);
-		File codocVcfFile = null;
-		File exons = new File(args[1]);
-		File outFile = new File(args[2]);
-		File csvFile = new File(args[3]);
-		int binSize = Integer.parseInt(args[4]);
-		doGeneAnalysis(codocFile, codocVcfFile, exons, outFile, csvFile, binSize);
+		if (args.length < 3) {
+			System.err.println("Creates a FEATURE statistics file for the passed ISS/AMB/MSD signal using the passed gene annotations.");
+			System.err.println("Usage: " + ArgosGeneAnalysis.class + " <codoc-score-file> <ucsc-flat-file> <output.csv> [<stats.txt>]");
+			System.exit(1);
+		}
+
+		File covFile = new File(args[0]);
+		File ucscFlatFile = new File(args[1]);
+		PrintStream out = new PrintStream(args[2]);
+		PrintStream stats = System.out;
+		if (args.length > 3)
+			stats = new PrintStream(args[3]);
+
+		doGeneAnalysis2(covFile, null, ucscFlatFile, out, stats);
+
+		out.close();
 
 	}
 

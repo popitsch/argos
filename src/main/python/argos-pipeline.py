@@ -137,7 +137,7 @@ parser.add_argument("-step", type=int, required=False, dest="step", metavar="ste
 parser.add_argument("-ctxSize", type=int, required=False, dest="ctxSize", metavar="ctxSize", help="context size for local signals", default=10000)
 parser.add_argument("-dontclean", action="store_true", dest="dontclean", help="if set to true, the temp files will not be removed (for debugging purposes only!)", default=False)
 parser.add_argument("-recalcScores", type=bool, required=False, dest="recalcScores", metavar="recalcScores", help="force recalculation of mapping scores", default=False)
-parser.add_argument("-calcChrom", type=bool, required=False, dest="calcChrom", metavar="calcChrom", help="Calculation CHR ctx scores", default=False)
+parser.add_argument("-calcChrom", type=bool, required=False, dest="calcChrom", metavar="calcChrom", help="Calculation of per-chromosome ctx scores", default=False)
 parser.add_argument("-gpu", action="store_true", dest="useGpu", help="Use GPU for alignment", default=False)
 
 

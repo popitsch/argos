@@ -72,15 +72,15 @@ public class ArgosCreateGenomeStackedBarDiagrams {
     public static void main(String[] args) throws CodocException, IOException {
 	List<File> scoreCodocFiles = new ArrayList<File>();
 	List<String> scoreLabels = new ArrayList<String>();
-	scoreCodocFiles.add(new File("c:/data/genomicAmbiguity/ecK12/eck12_MG1655_ecoli-chr-GENOME.ISS.wig.codoc"));
+	scoreCodocFiles.add(new File("/project2/oesi/genAmb/output/ecK12/eck12_MG1655_ecoli-chr-GENOME.ISS.wig.codoc"));
 	scoreLabels.add("e.coli");
-	scoreCodocFiles.add(new File("c:/data/genomicAmbiguity/droso/droso_r5_partial-GENOME.ISS.wig.codoc"));
-	scoreLabels.add("d.mel");
-//	scoreCodocFiles.add(new File("c:/data/genomicAmbiguity/human/hg19-GENOME.ISS.wig.bw.wig.codoc"));
+//	scoreCodocFiles.add(new File("/project2/oesi/genAmb/output/dros_partial/droso_r5_partial-GENOME.ISS.wig.codoc"));
+//	scoreLabels.add("d.mel");
+//	scoreCodocFiles.add(new File("/project2/oesi/genAmb/output/hg19/hg19-GENOME.ISS.wig.codoc"));
 //	scoreLabels.add("h.sapiens");
 
-	File outAbs = new File("c:/data/genomicAmbiguity/stackedHistAbs.csv");
-	File outPrec = new File("c:/data/genomicAmbiguity/stackedHistPrec.csv");
+	File outAbs = new File("/project2/oesi/genAmb/output/POSTER_DATA/stackedHistAbs.csv");
+	File outPrec = new File("/project2/oesi/genAmb/output/POSTER_DATA/stackedHistPrec.csv");
 	createGenomeStackedBarDiagram(scoreCodocFiles, scoreLabels, 1, new PrintStream(outAbs), new PrintStream(outPrec));
     }
 
