@@ -12,7 +12,7 @@ import sys, os
 from pytz import reference
 # Necessary for including python modules from a parent directory
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from shared.utils import *
+from utils import *
 import string
 
 import datetime, time
