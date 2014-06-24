@@ -69,6 +69,10 @@ public class MapqAnalyzer {
 		while (it.hasNext()) {
 			SAMRecord rec = it.next();
 			int mapq = rec.getMappingQuality();
+			// skip secondary alignments (occurs, e.g., with bwa mem skipped-read alignment) 
+			if ( rec.getNotPrimaryAlignmentFlag() )
+				continue;
+			// skip reads not on the supported chroms
 			String chr = StringUtils.prefixedChr(rec.getReferenceName());
 			if (prefixedChrs != null && !prefixedChrs.contains(chr))
 				continue;
