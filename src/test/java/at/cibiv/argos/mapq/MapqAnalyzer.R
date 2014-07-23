@@ -3,6 +3,7 @@
 #
 library(scales)
 library(squash)
+library(data.table)
 
 args <- commandArgs(trailingOnly = TRUE)
 print(args)
@@ -14,7 +15,9 @@ fn=args[1]
 xlab=args[2]
 ylab=args[3]
 
-dat = data.frame(read.csv(fn, sep="\t", header=F))
+#data=fread("/project2/oesi/genAmb-OLD/test_data/human_wgs/mapping",sep="\t", nrows=277076786, header=F)
+raw=fread(fn, sep="\t", header=F)
+dat = data.frame(raw)
 output = paste( fn,"-",xlab,"-",ylab,".PLOT.pdf", sep="")
 
 pdf(output, width=10,height=10)
